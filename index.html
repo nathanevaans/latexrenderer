@@ -108,6 +108,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js"></script>
 <script>
+    const EQUATION_CACHE_KEY = 'equations';
+
     let draggedEquation;
     let removedEquations = [];
 
@@ -115,9 +117,11 @@
         const input = textarea.value;
         const output = textarea.nextElementSibling;
         output.innerHTML = katex.renderToString(input, {throwOnError: false, displayMode: true});
+
+        saveEquationsToCache()
     }
 
-    function addEquation() {
+    function addEquation(value="") {
         const equationsContainer = document.getElementById('equations-container');
 
         const equationContainer = document.createElement('div');
@@ -127,6 +131,7 @@
 
         const textarea = document.createElement('textarea');
         textarea.className = 'equation-input';
+        textarea.value = value
         textarea.addEventListener('input', function () {
             renderLaTeX(this);
             this.style.height = "5px";
@@ -149,6 +154,8 @@
         equationsContainer.appendChild(equationContainer);
 
         equationContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+        return textarea
     }
 
     function removeEquation(button) {
@@ -157,6 +164,7 @@
         const removedIndex = Array.from(equationsContainer.children).indexOf(equationContainer);
         removedEquations.push({ equation: equationContainer, index: removedIndex });
         equationsContainer.removeChild(equationContainer);
+        saveEquationsToCache();
     }
 
     function undoRemoveEquation() {
@@ -168,6 +176,7 @@
             const targetEquation = equations[index] || null;
             equationsContainer.insertBefore(equation, targetEquation);
         }
+        saveEquationsToCache();
     }
 
     function preventTabFocusChange(event) {
@@ -217,6 +226,37 @@
         } else {
             equationsContainer.insertBefore(draggedEquation, dropTarget);
         }
+        saveEquationsToCache()
+    }
+
+    function saveEquationsToCache() {
+        const equationsContainer = document.getElementById('equations-container');
+        const textareas = equationsContainer.querySelectorAll('textarea');
+        const equationValues = [];
+
+        textareas.forEach((textarea) => {
+            equationValues.push(textarea.value);
+        });
+
+        const cachedEquations = JSON.stringify(equationValues);
+        localStorage.setItem(EQUATION_CACHE_KEY, cachedEquations);
+    }
+
+    function loadCachedEquations() {
+        const cachedEquations = localStorage.getItem(EQUATION_CACHE_KEY);
+        if (cachedEquations) {
+            const equationValues = JSON.parse(cachedEquations)
+            if (equationValues.length !== 0) {
+                equationValues.forEach((value) => {
+                    const ta = addEquation(value)
+                    renderLaTeX(ta)
+                })
+            } else {
+                addEquation()
+            }
+        } else {
+            addEquation()
+        }
     }
 
     const equationsContainer = document.getElementById('equations-container');
@@ -225,7 +265,7 @@
     equationsContainer.addEventListener('dragleave', dragLeave);
     equationsContainer.addEventListener('drop', dragDrop);
 
-    addEquation()
+    loadCachedEquations();
 </script>
 </body>
 </html>
