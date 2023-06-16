@@ -154,6 +154,8 @@
 
         equationContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
 
+        saveEquationsToCache()
+
         return textarea
     }
 
@@ -255,6 +257,7 @@
                     const ta = addEquation(value)
                     adjustTextAreaHeight(ta)
                     renderLaTeX(ta)
+                    window.scrollTo({ top: 0});
                 })
             } else {
                 addEquation()
