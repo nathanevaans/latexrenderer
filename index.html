@@ -1,99 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f6f8fa;
-        }
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f6f8fa;
+    }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
 
-        #equations-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    #equations-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-        .equation-container {
-            position: relative;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: flex; /* Add this line */
-            flex-direction: column;
-            justify-content: center; /* Add this line */
-            align-items: center;
-        }
+    .equation-container {
+      position: relative;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: flex; /* Add this line */
+      flex-direction: column;
+      justify-content: center; /* Add this line */
+      align-items: center;
+    }
 
-        .equation-container.over {
-            border: 2px dashed #555;
-        }
+    .equation-container.over {
+      border: 2px dashed #555;
+    }
 
-        .equation-container.over textarea,
-        .equation-container.over .equation-output,
-        .equation-container.over button {
-            pointer-events: none;
-        }
+    .equation-container.over textarea,
+    .equation-container.over .equation-output,
+    .equation-container.over button {
+      pointer-events: none;
+    }
 
-        textarea {
-            width: 100%;
-            height: 100px;
-            resize: none;
-            padding: 8px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            color: #333;
-            font-family: inherit;
-            background-color: #f9f9f9;
-        }
+    textarea {
+      width: 100%;
+      height: 100px;
+      resize: none;
+      padding: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      color: #333;
+      font-family: inherit;
+      background-color: #f9f9f9;
+    }
 
-        .equation-output {
-            width: 100%;
-            margin-top: 10px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            color: #333;
-            background-color: #fff;
-            min-height: 2em; /* Set a fixed initial height */
-        }
+    .equation-output {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #333;
+      background-color: #fff;
+      min-height: 2em; /* Set a fixed initial height */
+    }
 
-        button {
-            display: block;
-            margin-top: 10px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background-color: #333;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
+    button {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
-        button:hover {
-            background-color: #555;
-        }
+    button:hover {
+      background-color: #555;
+    }
 
-        .over {
-            background-color: #f1f1f1 !important;
-        }
+    .over {
+      background-color: #f1f1f1 !important;
+    }
 
-        .add-equation-container {
-            display: flex;
-            justify-content: center;
-        }
-    </style>
-    <title>LaTeX Renderer</title>
+    .add-equation-container {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+  <title>LaTeX Renderer</title>
 </head>
 <body>
 <h1>LaTeX Renderer</h1>
@@ -102,113 +102,129 @@
 </div>
 
 <div class="add-equation-container">
-    <button onclick="addEquation()">Add Equation</button>
+  <button onclick="addEquation()">Add Equation</button>
+  <button onclick="undoRemoveEquation()">Undo Remove</button>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js"></script>
 <script>
-    let draggedEquation;
+  let draggedEquation;
+  let removedEquations = [];
 
-    function renderLaTeX(textarea) {
-        const input = textarea.value;
-        const output = textarea.nextElementSibling;
-        output.innerHTML = katex.renderToString(input, {throwOnError: false});
-    }
+  function renderLaTeX(textarea) {
+    const input = textarea.value;
+    const output = textarea.nextElementSibling;
+    output.innerHTML = katex.renderToString(input, {throwOnError: false});
+  }
 
-    function addEquation() {
-        const equationsContainer = document.getElementById('equations-container');
-
-        const equationContainer = document.createElement('div');
-        equationContainer.className = 'equation-container';
-        equationContainer.draggable = true;
-        equationContainer.addEventListener('dragstart', dragStart);
-
-        const textarea = document.createElement('textarea');
-        textarea.className = 'equation-input';
-        textarea.addEventListener('input', function () {
-            renderLaTeX(this);
-        });
-        textarea.addEventListener('keydown', preventTabFocusChange);
-
-        const output = document.createElement('div');
-        output.className = 'equation-output';
-
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove';
-        removeButton.addEventListener('click', function () {
-            removeEquation(this);
-        });
-
-        equationContainer.appendChild(textarea);
-        equationContainer.appendChild(output);
-        equationContainer.appendChild(removeButton);
-        equationsContainer.appendChild(equationContainer);
-
-        equationContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
-    }
-
-    function removeEquation(button) {
-        const equationContainer = button.parentNode;
-        const equationsContainer = equationContainer.parentNode;
-        equationsContainer.removeChild(equationContainer);
-    }
-
-    function preventTabFocusChange(event) {
-        if (event.key === 'Tab') {
-            event.preventDefault();
-            const textarea = event.target;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
-            textarea.selectionStart = textarea.selectionEnd = start + 1;
-        }
-    }
-
-    function dragStart(event) {
-        const textarea = event.target.querySelector('textarea');
-        if (textarea !== document.activeElement) {
-            draggedEquation = event.target;
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/html', draggedEquation.outerHTML);
-        } else {
-            event.preventDefault();
-        }
-    }
-
-    function dragOver(event) {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-    }
-
-    function dragEnter(event) {
-        event.target.classList.add('over');
-    }
-
-    function dragLeave(event) {
-        event.target.classList.remove('over');
-    }
-
-    function dragDrop(event) {
-        event.preventDefault();
-        event.target.classList.remove('over');
-        const dropTarget = event.target.closest('.equation-container');
-        const equationsContainer = dropTarget.parentNode;
-        const draggedIndex = Array.from(equationsContainer.children).indexOf(draggedEquation);
-        const dropIndex = Array.from(equationsContainer.children).indexOf(dropTarget);
-        if (draggedIndex < dropIndex) {
-            equationsContainer.insertBefore(draggedEquation, dropTarget.nextSibling);
-        } else {
-            equationsContainer.insertBefore(draggedEquation, dropTarget);
-        }
-    }
-
+  function addEquation() {
     const equationsContainer = document.getElementById('equations-container');
-    equationsContainer.addEventListener('dragover', dragOver);
-    equationsContainer.addEventListener('dragenter', dragEnter);
-    equationsContainer.addEventListener('dragleave', dragLeave);
-    equationsContainer.addEventListener('drop', dragDrop);
 
-    addEquation()
+    const equationContainer = document.createElement('div');
+    equationContainer.className = 'equation-container';
+    equationContainer.draggable = true;
+    equationContainer.addEventListener('dragstart', dragStart);
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'equation-input';
+    textarea.addEventListener('input', function () {
+      renderLaTeX(this);
+    });
+    textarea.addEventListener('keydown', preventTabFocusChange);
+
+    const output = document.createElement('div');
+    output.className = 'equation-output';
+
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.addEventListener('click', function () {
+      removeEquation(this);
+    });
+
+    equationContainer.appendChild(textarea);
+    equationContainer.appendChild(output);
+    equationContainer.appendChild(removeButton);
+    equationsContainer.appendChild(equationContainer);
+
+    equationContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }
+
+  function removeEquation(button) {
+    const equationContainer = button.parentNode;
+    const equationsContainer = equationContainer.parentNode;
+    const removedIndex = Array.from(equationsContainer.children).indexOf(equationContainer);
+    removedEquations.push({ equation: equationContainer, index: removedIndex });
+    equationsContainer.removeChild(equationContainer);
+  }
+
+  function undoRemoveEquation() {
+    const equationsContainer = document.getElementById('equations-container');
+
+    if (removedEquations.length > 0) {
+      const { equation, index } = removedEquations.pop();
+      const equations = Array.from(equationsContainer.children);
+      const targetEquation = equations[index] || null;
+      equationsContainer.insertBefore(equation, targetEquation);
+    }
+  }
+
+  function preventTabFocusChange(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const textarea = event.target;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+    }
+  }
+
+  function dragStart(event) {
+    const textarea = event.target.querySelector('textarea');
+    if (textarea !== document.activeElement) {
+      draggedEquation = event.target;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/html', draggedEquation.outerHTML);
+    } else {
+      event.preventDefault();
+    }
+  }
+
+  function dragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }
+
+  function dragEnter(event) {
+    event.target.classList.add('over');
+  }
+
+  function dragLeave(event) {
+    event.target.classList.remove('over');
+  }
+
+  function dragDrop(event) {
+    event.preventDefault();
+    event.target.classList.remove('over');
+    const dropTarget = event.target.closest('.equation-container');
+    const equationsContainer = dropTarget.parentNode;
+    const draggedIndex = Array.from(equationsContainer.children).indexOf(draggedEquation);
+    const dropIndex = Array.from(equationsContainer.children).indexOf(dropTarget);
+    if (draggedIndex < dropIndex) {
+      equationsContainer.insertBefore(draggedEquation, dropTarget.nextSibling);
+    } else {
+      equationsContainer.insertBefore(draggedEquation, dropTarget);
+    }
+  }
+
+  const equationsContainer = document.getElementById('equations-container');
+  equationsContainer.addEventListener('dragover', dragOver);
+  equationsContainer.addEventListener('dragenter', dragEnter);
+  equationsContainer.addEventListener('dragleave', dragLeave);
+  equationsContainer.addEventListener('drop', dragDrop);
+
+  addEquation()
 </script>
 </body>
 </html>
