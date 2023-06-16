@@ -3,6 +3,8 @@
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css">
   <style>
+    .katex { font-size: 1.5em; }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -115,7 +117,7 @@
   function renderLaTeX(textarea) {
     const input = textarea.value;
     const output = textarea.nextElementSibling;
-    output.innerHTML = katex.renderToString(input, {throwOnError: false});
+    output.innerHTML = katex.renderToString(input, {throwOnError: false, displayMode: true});
   }
 
   function addEquation() {
