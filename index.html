@@ -129,7 +129,7 @@
         const output = textarea.nextElementSibling;
         try {
             output.innerHTML = katex.renderToString(input, {throwOnError: false, displayMode: true});
-        } catch e {
+        } catch (e) {
             output.innerHTML = _.escape(e)
         }
 
