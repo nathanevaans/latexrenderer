@@ -129,8 +129,10 @@
         const output = textarea.nextElementSibling;
         try {
             output.innerHTML = katex.renderToString(input, {throwOnError: true, displayMode: true});
+            output.style.color = 'black';
         } catch (e) {
-            output.innerHTML = _.escape(e)
+            output.innerHTML = _.escape(e);
+            output.style.color = 'red';
         }
 
         saveEquationsToCache()
@@ -149,7 +151,7 @@
         textarea.value = value
         textarea.addEventListener('input', function () {
             renderLaTeX(this);
-            adjustTextAreaHeight(this)
+            adjustTextAreaHeight(this);
         });
         textarea.addEventListener('keydown', preventTabFocusChange);
 
@@ -169,9 +171,9 @@
 
         equationContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
 
-        saveEquationsToCache()
+        saveEquationsToCache();
 
-        return textarea
+        return textarea;
     }
 
     function adjustTextAreaHeight(textArea) {
@@ -247,7 +249,7 @@
         } else {
             equationsContainer.insertBefore(draggedEquation, dropTarget);
         }
-        saveEquationsToCache()
+        saveEquationsToCache();
     }
 
     function saveEquationsToCache() {
@@ -269,16 +271,16 @@
             const equationValues = JSON.parse(cachedEquations)
             if (equationValues.length !== 0) {
                 equationValues.forEach((value) => {
-                    const ta = addEquation(value)
-                    adjustTextAreaHeight(ta)
-                    renderLaTeX(ta)
+                    const ta = addEquation(value);
+                    adjustTextAreaHeight(ta);
+                    renderLaTeX(ta);
                     window.scrollTo({ top: 0});
                 })
             } else {
-                addEquation()
+                addEquation();
             }
         } else {
-            addEquation()
+            addEquation();
         }
     }
 
