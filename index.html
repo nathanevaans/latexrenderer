@@ -128,7 +128,7 @@
         const input = textarea.value;
         const output = textarea.nextElementSibling;
         try {
-            output.innerHTML = katex.renderToString(input, {throwOnError: false, displayMode: true});
+            output.innerHTML = katex.renderToString(input, {throwOnError: true, displayMode: true});
         } catch (e) {
             output.innerHTML = _.escape(e)
         }
