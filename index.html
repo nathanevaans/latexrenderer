@@ -98,6 +98,11 @@
             display: flex;
             justify-content: center;
         }
+
+        .equation-input {
+            font-family: monospace;
+            word-break: break-all;
+        }
     </style>
     <title>LaTeX Renderer</title>
 </head>
@@ -112,6 +117,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script>
     const EQUATION_CACHE_KEY = 'equations';
 
@@ -121,7 +127,11 @@
     function renderLaTeX(textarea) {
         const input = textarea.value;
         const output = textarea.nextElementSibling;
-        output.innerHTML = katex.renderToString(input, {throwOnError: false, displayMode: true});
+        try {
+            output.innerHTML = katex.renderToString(input, {throwOnError: true, displayMode: true});
+        } catch (e) {
+            output.innerHTML = _.escape(e)
+        }
 
         saveEquationsToCache()
     }
